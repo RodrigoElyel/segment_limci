@@ -29,12 +29,13 @@ for file in list(os.scandir(origin_dir))[2:3]:
     img_hsvS = rgb2hsv(input_img)[:,:,1]
     img_median = median(img, selem=disk(7))
 
-    # SUPERPIXEL
+    # SUPERPIXELS
     imgTeste = img_as_ubyte(input_img)
     segments_slic = slic(imgTeste, n_segments=4000, compactness=10, sigma=1)
     sp = mark_boundaries(imgTeste, segments_slic)
     figure("super")
     imshow(sp)
+
 
     # image_label_overlay = label2rgb(segments_slic, image=input_img)
     # figure("uper")
@@ -47,16 +48,18 @@ for file in list(os.scandir(origin_dir))[2:3]:
     for prop in region:
         if prop.area > 500 and prop.area < 700 :
             lista.append(prop.area)
+        else:
+            lista.append(0)
 
-    stackk = np.stack((img, img2, img_hsvS, img_median), axis=2)
-    img = np.reshape(stackk, (1080 * 1920, 4))
-
-
+    # show()
+    # exit()
+    # stackk = np.stack((img, img2, img_hsvS, img_median), axis=2)
+    # img = np.reshape(stackk, (1080 * 1920, 4))
 
     kmc = KMeans(n_clusters=8, n_init=1, verbose=False, random_state=0, n_jobs=8)
     mask = kmc.fit_predict(lista)
 
-    mask = np.reshape(mask, (1080, 1920,))
+    # mask = np.reshape(mask, (1080, 1920,))
 
     figure("Grouping")
     imshow(mask, cmap='Paired')
