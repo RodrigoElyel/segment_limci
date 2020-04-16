@@ -31,39 +31,44 @@ for file in list(os.scandir(origin_dir))[2:3]:
 
     # SUPERPIXELS
     imgTeste = img_as_ubyte(input_img)
+
     segments_slic = slic(imgTeste, n_segments=4000, compactness=10, sigma=1)
+    figure("segments_slic")
+    imshow(segments_slic)
+
     sp = mark_boundaries(imgTeste, segments_slic)
     figure("super")
     imshow(sp)
 
-
-    # image_label_overlay = label2rgb(segments_slic, image=input_img)
-    # figure("uper")
-    # imshow(image_label_overlay)
-
     region = regionprops(segments_slic, intensity_image=None, cache=True)
+    print(segments_slic.shape)
+    print(sp.shape)
 
-    lista = []
-    count = 0
+    cont = 0
     for prop in region:
         if prop.area > 500 and prop.area < 700 :
-            lista.append(prop.area)
-        else:
-            lista.append(0)
+            print(prop.area)
+            cont += 1
+
+    print("cont = ", cont)
+
+
+    kmc = KMeans(n_clusters=8, n_init=1, verbose=False, random_state=0, n_jobs=8)
+    mask = kmc.fit_predict(segments_slic)
 
     # show()
     # exit()
-    # stackk = np.stack((img, img2, img_hsvS, img_median), axis=2)
-    # img = np.reshape(stackk, (1080 * 1920, 4))
 
-    kmc = KMeans(n_clusters=8, n_init=1, verbose=False, random_state=0, n_jobs=8)
-    mask = kmc.fit_predict(lista)
-
-    # mask = np.reshape(mask, (1080, 1920,))
+    mask = np.reshape(mask, (1080, 1920,))
 
     figure("Grouping")
     imshow(mask, cmap='Paired')
+
+    # show()
+    # exit()
+
     pltsave(dest_dir + file.name, mask, cmap='Paired')
+
 
     mask = mask == 5 #indice # label for color id
 
@@ -82,6 +87,8 @@ for file in list(os.scandir(origin_dir))[2:3]:
 
     show()
 
+    # stackk = np.stack((img, img2, img_hsvS, img_median), axis=2)
+    # img = np.reshape(stackk, (1080 * 1920, 4))
 
     # for i in range(0, 7):
     #     print("Linha - {}".format(i))
